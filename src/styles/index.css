@@ -1,3 +1,35 @@
 @import './fonts.css';
 @import './tailwind.css';
 @import './theme.css';
+
+/* Контейнер для имитации листов */
+.paper-container {
+  background-color: #e2e8f0; /* Серый фон как в Word */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 0;
+  gap: 20px; /* Расстояние между листами */
+}
+
+.a4-page {
+  background: white;
+  width: 210mm; /* Стандарт A4 */
+  min-height: 297mm; /* Стандарт A4 */
+  padding: 20mm; /* Поля как в Word */
+  margin: 0 auto;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  position: relative;
+  /* Фоновый паттерн для имитации разрывов, если контент длинный */
+}
+
+/* Магия: создаем визуальные разрывы через градиент на фоне */
+.paged-content {
+  background-image: linear-gradient(#fff 0%, #fff 296mm, #e2e8f0 296mm, #e2e8f0 297mm);
+  background-size: 100% 297mm;
+  width: 210mm;
+  padding: 20mm;
+  min-height: 297mm;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  border: 1px solid #d1d5db;
+}
