@@ -20,6 +20,7 @@ export function AuthPage({ onLogin }: { onLogin: () => void }) {
         transition={{ duration: 0.5 }}
         className="w-full max-w-[420px] relative z-10"
       >
+        
         {/* Логотип */}
         <div className="flex flex-col items-center mb-10">
           <div className="w-16 h-16 bg-red-800 rounded-2xl flex items-center justify-center mb-4">

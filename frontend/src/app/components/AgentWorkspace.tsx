@@ -60,7 +60,7 @@ const STATUS_MAP: { [key: string]: number } = {
   failed: -1,
 };
 
-const API_BASE = "http://localhost:8001";
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8001"
 
 function FileUpload({ onFileSelected }: { onFileSelected: (file: File) => void }) {
   return (
@@ -109,67 +109,67 @@ export default function MeetingMinutesWorkspace({ onBack }: Props) {
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const dropRef = useRef<HTMLDivElement>(null);
 
-useEffect(() => {
-  const savedState = localStorage.getItem('meetingWorkspace');
-  if (savedState) {
-    try {
-      const parsed = JSON.parse(savedState);
-      
-      // Сначала восстанавливаем все состояния
-      setMeetingId(parsed.meetingId);
-      setTaskId(parsed.taskId);
-      setTranscript(parsed.transcript);
-      setMeetingInfo(parsed.meetingInfo);
-      setMinutesData(parsed.minutesData);
-      setDoc(parsed.doc || "");
-      setMode(parsed.mode || "view");
-      setLastFetched(parsed.lastFetched);
-      setMessages(parsed.messages || []);
-      setTitle(parsed.title || "");
-      setParticipants(parsed.participants || []);
-      setStatus(parsed.status);
-      setCurrentStep(parsed.currentStep || -1);
-      setIsProcessing(parsed.isProcessing || false);
-      setIsChatOpen(parsed.isChatOpen || false);
-      
-      if (parsed.isProcessing && parsed.taskId) {
-        // Небольшая задержка чтобы состояние успело примениться
-        setTimeout(() => {
-          startPolling(parsed.taskId);
-        }, 100);
-      }
-      
-    } catch (e) {
-      console.error("Ошибка загрузки:", e);
-    }
-  }
-}, []);
+  useEffect(() => {
+    const savedState = localStorage.getItem('meetingWorkspace');
+    if (savedState) {
+      try {
+        const parsed = JSON.parse(savedState);
 
-// Автосохранение при изменениях
-useEffect(() => {
-  const stateToSave = {
-    meetingId,
-    taskId,
-    transcript,
-    meetingInfo,
-    minutesData,
-    doc,
-    mode,
-    lastFetched,
-    messages,
-    title,
-    participants,
-    status,
-    currentStep,
-    isProcessing,
-    isChatOpen,
-  };
-  localStorage.setItem('meetingWorkspace', JSON.stringify(stateToSave));
-}, [
-  meetingId, taskId, transcript, meetingInfo, minutesData, doc, mode,
-  lastFetched, messages, title, participants, status, currentStep,
-  isProcessing, isChatOpen
-]);
+        // Сначала восстанавливаем все состояния
+        setMeetingId(parsed.meetingId);
+        setTaskId(parsed.taskId);
+        setTranscript(parsed.transcript);
+        setMeetingInfo(parsed.meetingInfo);
+        setMinutesData(parsed.minutesData);
+        setDoc(parsed.doc || "");
+        setMode(parsed.mode || "view");
+        setLastFetched(parsed.lastFetched);
+        setMessages(parsed.messages || []);
+        setTitle(parsed.title || "");
+        setParticipants(parsed.participants || []);
+        setStatus(parsed.status);
+        setCurrentStep(parsed.currentStep || -1);
+        setIsProcessing(parsed.isProcessing || false);
+        setIsChatOpen(parsed.isChatOpen || false);
+
+        if (parsed.isProcessing && parsed.taskId) {
+          // Небольшая задержка чтобы состояние успело примениться
+          setTimeout(() => {
+            startPolling(parsed.taskId);
+          }, 100);
+        }
+
+      } catch (e) {
+        console.error("Ошибка загрузки:", e);
+      }
+    }
+  }, []);
+
+  // Автосохранение при изменениях
+  useEffect(() => {
+    const stateToSave = {
+      meetingId,
+      taskId,
+      transcript,
+      meetingInfo,
+      minutesData,
+      doc,
+      mode,
+      lastFetched,
+      messages,
+      title,
+      participants,
+      status,
+      currentStep,
+      isProcessing,
+      isChatOpen,
+    };
+    localStorage.setItem('meetingWorkspace', JSON.stringify(stateToSave));
+  }, [
+    meetingId, taskId, transcript, meetingInfo, minutesData, doc, mode,
+    lastFetched, messages, title, participants, status, currentStep,
+    isProcessing, isChatOpen
+  ]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -401,37 +401,37 @@ useEffect(() => {
   };
 
   const createTask = async () => {
-  if (!meetingId) return;
-  setIsProcessing(true);
-  setCurrentStep(0);
-  setStartTime(Date.now());
-  setDoc("");
-  setTranscript(null);
-  try {
-    const res = await fetch(`${API_BASE}/api/v2/tasks`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ meeting_id: meetingId }),
-    });
-    if (!res.ok) throw new Error("Task creation failed");
-    const data = await res.json();
-    setTaskId(data.id);
-    
-    const savedState = JSON.parse(localStorage.getItem('meetingWorkspace') || '{}');
-    localStorage.setItem('meetingWorkspace', JSON.stringify({
-      ...savedState,
-      taskId: data.id,
-      isProcessing: true,
-      currentStep: 0
-    }));
-    
-    startPolling(data.id);
-  } catch (err) {
-    console.error(err);
-    setError("Ошибка создания задачи");
-    setIsProcessing(false);
-  }
-};
+    if (!meetingId) return;
+    setIsProcessing(true);
+    setCurrentStep(0);
+    setStartTime(Date.now());
+    setDoc("");
+    setTranscript(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/v2/tasks`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ meeting_id: meetingId }),
+      });
+      if (!res.ok) throw new Error("Task creation failed");
+      const data = await res.json();
+      setTaskId(data.id);
+
+      const savedState = JSON.parse(localStorage.getItem('meetingWorkspace') || '{}');
+      localStorage.setItem('meetingWorkspace', JSON.stringify({
+        ...savedState,
+        taskId: data.id,
+        isProcessing: true,
+        currentStep: 0
+      }));
+
+      startPolling(data.id);
+    } catch (err) {
+      console.error(err);
+      setError("Ошибка создания задачи");
+      setIsProcessing(false);
+    }
+  };
 
   const handleSendMessage = () => {
     if (!chatInput.trim()) return;
@@ -479,37 +479,33 @@ useEffect(() => {
 
   return (
     <div className="h-screen flex bg-gray-50 overflow-hidden" ref={dropRef}>
-      {/* LEFT PANEL — САЙДБАР */}
       <aside className="pl-1 w-96 bg-black text-gray-200 border-r border-gray-800/50 flex flex-col">
         <div className="p-3 bg-[#1c1c1c] text-gray-200 flex flex-col h-full">
-          {/* Header */}
           <div className="p-5 border-b border-gray-800/50 flex items-center justify-between">
-    {isChatOpen ? (
-      // В чате — кнопка "Назад" для возврата к инструментам
-      <Button
-        variant="ghost"
-        onClick={() => setIsChatOpen(false)}
-        className="text-gray-400 hover:text-white hover:bg-gray-800/70 rounded-lg transition-all"
-      >
-        <ArrowLeft className="w-5 h-5 mr-2" />
-        Инструменты
-      </Button>
-    ) : (
-      // На главной — просто текст "Инструменты"
-      <span className="text-gray-200 font-medium"></span>
-    )}
+            {isChatOpen ? (
+              <Button
+                variant="ghost"
+                onClick={() => setIsChatOpen(false)}
+                className="text-gray-400 hover:text-white hover:bg-gray-800/70 rounded-lg transition-all"
+              >
+                <ArrowLeft className="w-5 h-5 mr-2" />
+                Инструменты
+              </Button>
+            ) : (
+              <span className="text-gray-200 font-medium"></span>
+            )}
 
-    {isChatOpen && (
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => setMessages([])}
-        className="text-gray-400 hover:text-white hover:bg-gray-800/70 rounded-lg transition-all"
-      >
-        <RotateCcw className="w-5 h-5" />
-      </Button>
-    )}
-  </div>
+            {isChatOpen && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setMessages([])}
+                className="text-gray-400 hover:text-white hover:bg-gray-800/70 rounded-lg transition-all"
+              >
+                <RotateCcw className="w-5 h-5" />
+              </Button>
+            )}
+          </div>
 
           {/* Content */}
           <div className="flex-1">
@@ -964,20 +960,73 @@ useEffect(() => {
 
                   const lineHeight = 24;
                   const padding = 32;
-                  const availableHeight = 1000 - padding; 
+                  const availableHeight = 1000 - padding;
                   const linesPerPage = Math.floor(availableHeight / lineHeight);
 
                   const pages = [];
-                  for (let i = 0; i < lines.length; i += linesPerPage) {
-                    pages.push(lines.slice(i, i + linesPerPage).join('\n'));
+
+                  // Функция для проверки, является ли строка частью таблицы
+                  const isTableLine = (line: string): boolean => {
+                    return line.includes('|') && (line.trim().startsWith('|') || line.includes('---'));
+                  };
+
+                  // Функция для проверки, содержит ли блок таблицу
+                  const containsTable = (blockLines: string[]): boolean => {
+                    let inTable = false;
+                    for (const line of blockLines) {
+                      if (isTableLine(line)) {
+                        inTable = true;
+                      } else if (inTable && line.trim() === '') {
+                        inTable = false;
+                      }
+                    }
+                    return inTable;
+                  };
+
+                  // Умное разбиение на страницы
+                  let i = 0;
+                  while (i < lines.length) {
+                    let end = Math.min(i + linesPerPage, lines.length);
+                    let candidateLines = lines.slice(i, end);
+
+                    // Проверяем, не разрывает ли текущий блок таблицу
+                    if (containsTable(candidateLines)) {
+                      // Ищем начало таблицы в этом блоке
+                      let tableStart = -1;
+                      for (let j = 0; j < candidateLines.length; j++) {
+                        if (isTableLine(candidateLines[j])) {
+                          tableStart = j;
+                          break;
+                        }
+                      }
+
+                      if (tableStart > 0) {
+                        // Если таблица начинается не с первой строки — обрезаем до таблицы
+                        end = i + tableStart;
+                        if (end === i) end++; // Минимум 1 строка
+                      } else {
+                        // Если таблица начинается с первой строки, проверяем конец таблицы
+                        let tableEnd = tableStart;
+                        while (tableEnd < candidateLines.length &&
+                          (isTableLine(candidateLines[tableEnd]) || candidateLines[tableEnd].trim() === '')) {
+                          tableEnd++;
+                        }
+
+                        // Если таблица не помещается целиком — оставляем её на этой странице
+                        if (tableEnd < candidateLines.length) {
+                          end = i + tableEnd;
+                        }
+                      }
+                    }
+
+                    // Добавляем страницу
+                    pages.push(lines.slice(i, end).join('\n'));
+                    i = end;
                   }
 
                   return pages.map((pageText, index, arr) => (
-
-
                     <div key={index}>
-
-                      <div className=" bg-white shadow-md border border-slate-300 overflow-hidden p-8 prose prose-slate max-w-none">
+                      <div className="bg-white shadow-md border border-slate-300 overflow-hidden p-8 prose prose-slate max-w-none">
                         <MarkdownRenderer content={pageText} />
                       </div>
 

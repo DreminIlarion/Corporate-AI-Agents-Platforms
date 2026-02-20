@@ -4,7 +4,6 @@
 
   ## Running the code
 
-  Run `docker-compose up -d --build` to install the dependencies.
+  Run `docker-compose up -d --build` to start the development server.
 
-  Run `npm run dev` to start the development server.
   
